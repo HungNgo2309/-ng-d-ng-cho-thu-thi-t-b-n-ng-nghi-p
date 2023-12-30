@@ -18,7 +18,7 @@ const ProfileHome=({navigation})=>{
                 }
             }
         fetchProfile();
-    }, [Math.random()]);
+    }, []);
     const handleLogout = () => {
         auth().signOut().catch(error => console.log('Error logging out: ', error));
         };
@@ -26,13 +26,13 @@ const ProfileHome=({navigation})=>{
         <View>
             <View style={{flexDirection:'row',alignItems: 'center', justifyContent: 'space-between'}}>
                 
-                <View style={{marginLeft:20}}>
+                <View style={{marginLeft:20,flex:6}}>
                     <Text style={{alignSelf:'center',fontSize:30,fontWeight:'bold'}}>Chào khách hàng</Text>
-                    <Text>{welcome}</Text>
+                    <Text style={{textAlign:'center'}}>{welcome}</Text>
                 </View>
-                <Image style={{width:200,height:200}} source={require('../img/label.jpg')} />
+                <Image style={{width:200,height:200,flex:4}} source={require('../img/label.jpg')} />
             </View>
-            <View style={{marginLeft:10,backgroundColor:'white',paddingLeft:20}}>
+            <View style={{marginLeft:10,backgroundColor:'white',paddingLeft:20,marginRight:10}}>
                 <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}} onPress={()=>navigation.navigate("Profile")}>
                     <IconButton icon="account-cog"/>
                     <Text>Thông tin khách hàng</Text>
@@ -41,7 +41,7 @@ const ProfileHome=({navigation})=>{
                     <IconButton icon="file-document-edit-outline"/>
                     <Text>Điều khoản</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}}>
+                <TouchableOpacity onPress={()=>navigation.navigate("Chat")} style={{flexDirection:'row',alignItems:'center'}}>
                     <IconButton icon="chat-question"/>
                     <Text>Trợ giúp</Text>
                 </TouchableOpacity>

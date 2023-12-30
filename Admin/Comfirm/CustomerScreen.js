@@ -4,7 +4,16 @@ import firestore from '@react-native-firebase/firestore';
 import { Image } from 'react-native';
 import { Button, IconButton } from 'react-native-paper';
 import { useNavigation } from "@react-navigation/native";
+import { useWindowDimensions } from "react-native";
+import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 
+const renderTabBar = (props) => (
+  <TabBar
+    {...props}
+    indicatorStyle={{ backgroundColor: 'white' }}
+    style={{ backgroundColor: '#673ab7' }}
+  />
+);
 const CustomerScreen = () => {
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
@@ -12,6 +21,11 @@ const CustomerScreen = () => {
   const[loading,setLoading]=useState(true);
   const [databuy, setDatabuy] = useState([]);
   const [isVisible, setIsVisible] = useState(true);
+  const [routes] = useState([
+    { key: 'rent', title: 'Thuê' },
+    { key: 'buy', title: 'Mua' },
+  ]);
+  const [index, setIndex] = useState(0);
   function ChangeStatus(id,status)
     {
       const Rent = firestore().collection('Rent');
@@ -118,23 +132,32 @@ const CustomerScreen = () => {
       <View>
         <Text style={{ fontWeight: '600',fontSize:25,textAlign:'center' }}>Xác nhận đơn hàng</Text>
       </View>
-      <View style={{flexDirection:'row'}}>
-                <Button style={{flex:1}} mode={isVisible? 'contained' : 'outlined'} onPress={toggleVisibility}>Thuê</Button>
-                <Button  style={{flex:1}} mode={!isVisible? 'contained' : 'outlined'} onPress={toggleVisibility}>Mua</Button>
-            </View>
-            {isVisible ? (
+      <TabView
+        navigationState={{ index, routes }}
+        renderScene={({ route }) => {
+          switch (route.key) {
+            case 'rent':
+              return (
                 <FlatList
-                 data={data}
-                 renderItem={renderRent}
+                  data={data}
+                  renderItem={renderRent}
                 />
-            ) : 
-                (
-                    <FlatList
-                    data={databuy}
-                    renderItem={renderBuy}
-                   />
-                )
-            }
+              );
+            case 'buy':
+              return (
+                <FlatList
+                  data={databuy}
+                  renderItem={renderBuy}
+                />
+              );
+            default:
+              return null;
+          }
+        }}
+        onIndexChange={setIndex}
+        initialLayout={{ width: useWindowDimensions().width }}
+        renderTabBar={renderTabBar}
+      />
     </View>
   );
 };

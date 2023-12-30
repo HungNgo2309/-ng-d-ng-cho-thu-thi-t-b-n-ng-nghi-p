@@ -20,16 +20,16 @@ const ProductDetail=({route,navigation})=>{
     const [rating, setRating] = useState(0);
     const [review,setReview] = useState("");
     const [listreview,setListReview]=useState([]);
-    const Reviews = firestore().collection('Review');
+    
     const [loading,setLoading]=useState(false);
     const handleRatingChange = (value) => {
       setRating(value);
     };
 
-    const handleSubmit = () => {
+     const handleSubmit =async () => {
       // Xử lý đánh giá, có thể gửi đến máy chủ hoặc thực hiện hành động khác tùy thuộc vào yêu cầu của bạn
-     
-      Reviews.add({
+      const Reviews = firestore().collection('Review');
+      await Reviews.add({
         id_user: user.uid,
         id_product: product.id,
         context:review,
@@ -75,6 +75,7 @@ const ProductDetail=({route,navigation})=>{
             id_user: user.uid,
             id_product: product.id,
             quantity: 1,
+            checked:true,
           });
           Alert.alert("Đã thêm vào giỏ hàng");
         }
@@ -133,7 +134,7 @@ const ProductDetail=({route,navigation})=>{
             </TouchableOpacity>
         )}
     
-    function Review()
+    function ReviewComponent()
     {
       return(
         <View style={{marginLeft:10}}>
@@ -150,7 +151,7 @@ const ProductDetail=({route,navigation})=>{
             placeholder="Ý kiến của bạn"
             value={review}
             mode="outlined"
-            multiline={true}
+            multiline
             onChangeText={setReview}
           />
           <TouchableOpacity onPress={handleSubmit} style={{backgroundColor:"green",alignSelf:'center',margin:5}}>
@@ -222,54 +223,58 @@ useEffect(() => {
 
     
     return(
-        <ScrollView>
-        <View>
-            <View style={{flexDirection:'row'}}>
-                <IconButton style={{alignSelf:'flex-start'}} icon="keyboard-backspace"  onPress={()=>navigation.goBack()}/>
-                <Text style={{fontSize:30,textAlign:'center',fontWeight:"700",alignSelf:"center",alignItems:'center'}}>Chi tiết sản phẩm</Text>
-            </View>
-            
-            <View style={{borderWidth:0,margin:20,alignItems:'center',borderRadius:25,backgroundColor:'white'}}>
-                <Image style={{width:200,height:200}} source={{uri:product.img}} />
-                <Text>{product.name}</Text>
-                <Text>{Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}</Text>
-                <Text>{Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.rent)}/{product.time}</Text>
-                <View style={{flexDirection:'row'}}>
-                    <Button mode="contained" style={{alignSelf:'center'}} onPress={() => {setModalVisible(true);setRent(false);}}>
-                        Buy Now
-                    </Button>
-                    <Button mode="outlined" style={{alignSelf:'center'}} onPress={() => {setModalVisible(true);setRent(true);}}>
-                        Rent Now
-                    </Button>
-                    <IconButton icon='cart' onPress={()=>AddCart()}/>     
+      <View>
+      <FlatList
+        ListHeaderComponent={() => (
+            <View>
+                <View style={{ flexDirection: 'row' }}>
+                    <IconButton style={{ alignSelf: 'flex-start' }} icon="keyboard-backspace" onPress={() => navigation.goBack()} />
+                    <Text style={{ fontSize: 30, textAlign: 'center', fontWeight: "700", alignSelf: "center", alignItems: 'center' }}>Chi tiết sản phẩm</Text>
+                </View>
+
+                <View style={{ borderWidth: 0, margin: 20, alignItems: 'center', borderRadius: 25, backgroundColor: 'white' }}>
+                    <Image style={{ width: 200, height: 200 }} source={{ uri: product.img }} />
+                    <Text>{product.name}</Text>
+                    <Text>{Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}</Text>
+                    <Text>{Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.rent)}/{product.time}</Text>
+                    <View style={{ flexDirection: 'row' }}>
+                        <Button mode="contained" style={{ alignSelf: 'center' }} onPress={() => { setModalVisible(true); setRent(false); }}>
+                            Buy Now
+                        </Button>
+                        <Button mode="outlined" style={{ alignSelf: 'center' }} onPress={() => { setModalVisible(true); setRent(true); }}>
+                            Rent Now
+                        </Button>
+                        <IconButton icon='cart' onPress={() => AddCart()} />
+                    </View>
+                </View>
+
+                <View style={{ margin: 10 }}>
+                    <Text style={{ fontSize: 25, fontWeight: "700" }}>Mô tả</Text>
+                    <Text>{product.description}</Text>
+                </View>
+
+                {ReviewComponent()}
+
+                <View style={{ margin: 10 }}>
+                    <FlatList
+                        data={listreview}
+                        renderItem={renderReview}
+                        keyExtractor={item => item.id.toString()}
+                    />
+                </View>
+
+                <View>
+                    <Text style={{ fontSize: 25, fontWeight: '700', marginLeft: 10 }}>Các sản phẩm liên quan</Text>
+                    <FlatList
+                        horizontal
+                        renderItem={renderproduct}
+                        data={pcate}
+                        keyExtractor={item => item.id.toString()}
+                    />
                 </View>
             </View>
-            <View style={{margin:10}}>
-                <Text style={{fontSize:25,fontWeight:"700"}}>Mô tả</Text>
-                
-                    <Text>{product.description}
-                    </Text>
-                
-            </View>
-            {Review()}
-            <View style={{margin:10}}>
-                <FlatList
-                  data={listreview}
-                  renderItem={renderReview}
-                  keyExtractor={item=>item.id.toString()}
-                />
-            </View>
-           
-            <View>
-                <Text style={{fontSize:25,fontWeight:'700',marginLeft:10}}>Các sản phẩm liên quan</Text>
-                <FlatList
-                horizontal
-                renderItem={renderproduct}
-                data={pcate}
-                keyExtractor={item=>item.id.toString()}
-            />
-            </View>
-        </View>
+        )}
+    />
            {/* Modal */}
       <Provider>
         <Portal>
@@ -334,7 +339,7 @@ useEffect(() => {
           </Modal>
         </Portal>
       </Provider>
-        </ScrollView>
+        </View>
     )
 }
 export default ProductDetail;

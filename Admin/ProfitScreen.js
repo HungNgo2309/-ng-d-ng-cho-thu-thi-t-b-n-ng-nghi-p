@@ -5,6 +5,7 @@ import firestore from '@react-native-firebase/firestore';
 // Component chính cho màn hình thống kê lợi nhuận
 const ProfitScreen = () => {
   const [data,setData]=useState([]);
+  const [total, setTotal] = useState(0);
     useEffect(() => {
         const countProducts = async () => {
             const productData = {};
@@ -48,7 +49,14 @@ const ProfitScreen = () => {
                 productData[productId] = { ...productData[productId], ...productInfo };
               }
             });
-          
+            let totalProfit = 0;
+
+            Object.values(productData).forEach((item) => {
+              totalProfit += item.buyCount * item.price + item.rentCount * item.rent;
+            });
+      
+            setTotal(totalProfit);
+      
             return productData;
           };
           
@@ -62,10 +70,7 @@ const ProfitScreen = () => {
             });
       }, []);
 
-  const[total,setTotal]=useState(0);
-  // Render một mục trong danh sách thống kê lợi nhuận
   const renderProfitItem =({item})=>{
-      
       return(
           <View style={styles.profitItem}>
             <Text style={styles.productName}>{item.name}</Text>
@@ -76,11 +81,18 @@ const ProfitScreen = () => {
       )
   };
   return (
-    <View>      
+    <View style={{flex:1}}>      
       <FlatList
         data={Object.values(data)}
         renderItem={renderProfitItem}
       />
+      <View style={{height:100}}>
+            </View>
+       <View style={{position:'absolute',bottom:0,backgroundColor:'white',flexDirection:'row',alignItems: 'center', justifyContent: 'space-between',flex:1}}>
+                <Text style={{fontSize:22,fontWeight:'bold',flex:2}}>Tổng thu: </Text>
+                <Text style={{fontSize:22,fontWeight:'bold',flex:6,color:"red"}}>{Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total)}</Text>
+                
+        </View>
     </View>
   );
 };

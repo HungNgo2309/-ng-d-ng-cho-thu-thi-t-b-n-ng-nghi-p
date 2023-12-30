@@ -5,6 +5,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import auth from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
+import database from '@react-native-firebase/database';
 
 const SignupScreen=()=>{
     const navigation = useNavigation();
@@ -14,7 +15,11 @@ const SignupScreen=()=>{
     const[hidepass,sethidepass]=useState(true)
     const[hide_enter_pass,set_enter_hidepass]=useState(true)
     const[hidebutton,sethidebutton]=useState(true)
-
+   
+    database().ref('/users').push({
+        userId: 'hungnnvh@gmail.com',
+        userType: 'user',
+      });
     const hasErrors = () => {
         return !email.includes('@');
       };
@@ -30,6 +35,10 @@ const SignupScreen=()=>{
             address: "",
             password: password,
             role: "customer"
+          });
+          database().ref('/users').push({
+            userId: email,
+            userType: 'user',
           });
         } catch (error) {
           if (error.code === 'auth/email-already-in-use') {

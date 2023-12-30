@@ -24,7 +24,7 @@ const SearchDetail=({route,navigation})=>{
           }
         };
         fetchData();
-        setFilteredData(product);
+        setSearch(product);
       }, []);
       const removeDiacritics = (str) => {
         return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -35,7 +35,8 @@ const SearchDetail=({route,navigation})=>{
           item &&
           (
             (item.name && removeDiacritics(item.name).toLowerCase().includes(removeDiacritics(search).toLowerCase())) ||
-            (item.Idcategory && removeDiacritics(item.Idcategory).toLowerCase().includes(removeDiacritics(search).toLowerCase()))
+            (item.Idcategory && removeDiacritics(item.Idcategory).toLowerCase().includes(removeDiacritics(search).toLowerCase()))||
+            (item.Idcategory && removeDiacritics(item.description).toLowerCase().includes(removeDiacritics(search).toLowerCase()))
           )
         );
         setFilteredData(filteredResult);
@@ -48,7 +49,7 @@ const SearchDetail=({route,navigation})=>{
       
     const renderproduct=({item})=>{
         return(
-            <TouchableOpacity onPress={()=>navigation.navigate("ProductDetail",{product:item})}>
+            <TouchableOpacity style={{flex:5}} onPress={()=>navigation.navigate("ProductDetail",{product:item})}>
                  <Image style={{width:200,height:200}} source={{uri:item.img}} />
                  <View style={{alignItems:'center'}}>
                     <Text>{item.name}</Text>

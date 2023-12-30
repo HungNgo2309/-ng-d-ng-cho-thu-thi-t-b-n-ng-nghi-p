@@ -2,10 +2,9 @@ import React, { useContext, useEffect, useState } from "react";
 import { createStackNavigator } from '@react-navigation/stack';
 import BottomTab from "../Screens/BottomTab";
 import { AuthenticatedUserContext } from "../providers";
-import AdminHome from "../Admin/AdminHome";
 import firestore from '@react-native-firebase/firestore';
-import Router from "../Admin/Router";
-import MyTabs from "../Admin/Home";
+import Router from "../Admin/StackHome";
+import MyTabs from "../Admin/TabAdmin";
 
  const Stack = createStackNavigator();
  export const AppStack = () => {

@@ -3,20 +3,22 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 
-import Service from './Service';
+import Service from './AdminHome';
 import DetailService from './DetailsService';
-import EditService from './EditService';
+import EditService from './EditProduct';
 import RentDetail from './Comfirm/RentDetail';
 import BuyDetail from './Comfirm/BuyDetail';
-import AddProductScreen from './AddService';
+import AddProductScreen from './AddProduct';
+import Category from './Category';
 const Stack = createStackNavigator();
 const Router = () => {
   return (
-    <Stack.Navigator  screenOptions={{ headerShown: false }}>
+    <Stack.Navigator>
       <Stack.Screen name="Service" component={Service} />
       <Stack.Screen name="AddService" component={AddProductScreen} />
       <Stack.Screen name="DetailsService" component={DetailService} />
       <Stack.Screen name="EditService" component={EditService} />
+      <Stack.Screen name="Category" component={Category}/>
     </Stack.Navigator>
 
 

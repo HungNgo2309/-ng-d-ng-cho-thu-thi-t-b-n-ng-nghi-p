@@ -4,8 +4,7 @@ import { Text,Button, TextInput, IconButton } from "react-native-paper";
 import firestore from '@react-native-firebase/firestore';
 import { AuthenticatedUserContext } from "../providers";
 
-const CartToBuy=({route,navigation})=>{
-    const{data}=route.params;
+const CartToBuy=({navigation})=>{
     const[data2,setData2]=useState([]);
     const { user } = useContext(AuthenticatedUserContext);
     const[username,setUsername]=useState("");
@@ -14,10 +13,8 @@ const CartToBuy=({route,navigation})=>{
     const Profile = firestore().collection('Profile');
     async function AddBuy() {
         try {
-            setData2(data);
             const Rent = await firestore().collection('Buy');
                 data2.forEach(d=>{
-                    
                     Rent.add({
                         username:username,
                         phone:phone,
@@ -52,6 +49,28 @@ const CartToBuy=({route,navigation})=>{
                 console.error("Lỗi khi truy cập thông tin hồ sơ:", error);
             }
         };
+        const fetchData = async () => {
+            try {
+                // Truy vấn tất cả các documents từ collection "Products"
+                const productsSnapshot = await firestore().collection('Product').get();
+                const productsData = productsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        
+                // Truy vấn tất cả các documents từ collection "Cart"
+                const cartSnapshot = await firestore().collection('Cart').where('id_user','==',user.uid)
+                .where('checked','==',true).get();
+                const cartData = cartSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        
+                // Kết hợp dữ liệu từ cả hai collections
+                const mergedData = cartData.map((cartItem) => {
+                  const matchingProduct = productsData.find((product) => product.id === cartItem.id_product);
+                  return { ...cartItem, productData: matchingProduct };
+                });
+                setData2(mergedData);
+              } catch (error) {
+                console.error('Error fetching data: ', error);
+              }
+            };
+        fetchData();
         fetchProfile();  
     },[ ]);
     const renderItem=({item})=>{
@@ -67,7 +86,7 @@ const CartToBuy=({route,navigation})=>{
             </View>
         )
     }
-    const total = data.reduce((accumulator, item) => {
+    const total = data2.reduce((accumulator, item) => {
         if(item.checked)
         {
             return accumulator + item.productData.price * item.quantity;
@@ -78,7 +97,7 @@ const CartToBuy=({route,navigation})=>{
         <View style={{flex:1,backgroundColor:'#ffd9b3'}}>
             <View>
                 <FlatList
-                data={data}
+                data={data2}
                 renderItem={renderItem}
                 />
             </View>            

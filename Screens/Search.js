@@ -68,20 +68,14 @@ const SearchAutoComplete = () => {
         placeholder="Type Here..."
         onChangeText={handleSearch}
         value={search}
-        onIconPress={()=>navigation.navigate("SearchDetail",{product:filteredData})}
+        onIconPress={()=>navigation.navigate("SearchDetail",{product:search})}
       />
       {isSearching ? (
       <FlatList
         style={{position: 'absolute', top: 60, zIndex: 1,backgroundColor:'white',alignSelf:'center'}}
         data={filteredData}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-            <List.Item
-              title={item.name}
-              description={item.price}
-              left={()=><Image style={{height:50,width:50}} source={{uri:item.img}}/>}
-            />
-        )}
+        renderItem={renderCategories}
       />
       ) : null}
     </View>

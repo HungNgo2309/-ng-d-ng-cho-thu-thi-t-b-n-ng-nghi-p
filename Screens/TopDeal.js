@@ -66,7 +66,7 @@ const TopDeals=()=>{
       }, []);
     const renderproduct=({item})=>{
         return(
-            <TouchableOpacity style={{backgroundColor:"white",borderRadius:10,margin:5}}
+            <TouchableOpacity style={{backgroundColor:"white",borderRadius:10,margin:5,width:200}}
             onPress={()=>navigation.navigate("ProductDetail",{product:item})}>
                  <Image style={{width:200,height:200}} source={{uri:item.img}} />
                  <View style={{alignItems:'center'}}>

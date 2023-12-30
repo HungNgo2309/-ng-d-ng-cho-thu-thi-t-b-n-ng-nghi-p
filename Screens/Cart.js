@@ -77,29 +77,35 @@ const Cart=()=>{
       }
     };    
     useEffect(() => {
-      const fetchData = async () => {
-        try {
-            // Truy vấn tất cả các documents từ collection "Products"
-            const productsSnapshot = await firestore().collection('Product').get();
-            const productsData = productsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      // Lắng nghe sự kiện thay đổi trong collection "Product"
+      const productUnsubscribe = firestore().collection('Product').onSnapshot(productsSnapshot => {
+        const productsData = productsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     
-            // Truy vấn tất cả các documents từ collection "Cart"
-            const cartSnapshot = await firestore().collection('Cart').where('id_user','==',user.uid).get();
-            const cartData = cartSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        // Lắng nghe sự kiện thay đổi trong collection "Cart" với điều kiện id_user
+        const cartUnsubscribe = firestore().collection('Cart').where('id_user', '==', user.uid).onSnapshot(cartSnapshot => {
+          const cartData = cartSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     
-            // Kết hợp dữ liệu từ cả hai collections
-            const mergedData = cartData.map((cartItem) => {
-              const matchingProduct = productsData.find((product) => product.id === cartItem.id_product);
-              return { ...cartItem, productData: matchingProduct };
-            });
-            setData(mergedData);
-          } catch (error) {
-            console.error('Error fetching data: ', error);
-          }
-        };
+          // Kết hợp dữ liệu từ cả hai collections
+          const mergedData = cartData.map(cartItem => {
+            const matchingProduct = productsData.find(product => product.id === cartItem.id_product);
+            return { ...cartItem, productData: matchingProduct };
+          });
     
-        fetchData();
-    }, [loading, Math.random()]);
+          setData(mergedData);
+        });
+      });
+    
+      // Hủy đăng ký lắng nghe khi không còn cần
+      return () => {
+        productUnsubscribe();
+        // Hãy kiểm tra xem cartUnsubscribe có tồn tại không trước khi gọi
+        if (cartUnsubscribe) {
+          cartUnsubscribe();
+        }
+      };
+    }, [user.uid]);
+    
+    
     //console.log(data);
     
     const total = data.reduce((accumulator, item) => {
@@ -157,13 +163,13 @@ const Cart=()=>{
                     />
                 <Image style={{width:100,height:100}} source={{uri:item.productData.img}} />
             </View>
-            <TouchableOpacity style={{flex:3,marginLeft:5}} onPress={()=>navigation.navigate('Home', { screen: 'ProductDetail', params: { product: item.productData }})}>
+            <TouchableOpacity style={{flex:3,marginLeft:5}} onPress={()=>navigation.navigate('HomeApp', { screen: 'ProductDetail', params: { product: item.productData }})}>
                 <Text  style={{fontSize:20,fontWeight:"bold"}}>{item.productData.name}</Text> 
                 <Text>{Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.productData.price * item.quantity)}</Text>
                 <Text>Loại DV</Text>
             </TouchableOpacity>
             
-            <View style={{flexDirection:'row',flex:3,alignItems:'center'}}>
+            <View style={{flexDirection:'row',flex:2,alignItems:'center'}}>
                 <IconButton icon='plus-thick' onPress={()=>InQuanity(item.id_product,item.quantity)}/>
                 <Text style={{fontSize:20}} >{item.quantity}</Text>
                 <IconButton icon='minus-thick' onPress={()=>DeQuanity(item.id_product,item.quantity)}/>
@@ -215,7 +221,7 @@ const Cart=()=>{
         <View style={{position:'absolute',bottom:0,backgroundColor:'white',flexDirection:'row',alignItems: 'center', justifyContent: 'space-between',flex:1}}>
                 <Text style={{fontSize:22,fontWeight:'bold',flex:2}}>Tổng tiền: </Text>
                 <Text style={{fontSize:22,fontWeight:'bold',flex:4,color:"red"}}>{Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total)}</Text>
-                <Button style={{justifyContent:'flex-end',flex:2, backgroundColor:"#ff4500"}} labelStyle={{color:"white"}} onPress={()=>navigation.navigate("CarttoBuy",{data:data})} >Đặt hàng</Button>
+                <Button style={{justifyContent:'flex-end',flex:2, backgroundColor:"#ff4500"}} labelStyle={{color:"white"}} onPress={()=>navigation.navigate("CarttoBuy")} >Đặt hàng</Button>
             </View>
         </View>
         </PaperProvider>

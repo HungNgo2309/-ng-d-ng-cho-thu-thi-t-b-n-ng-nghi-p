@@ -29,7 +29,7 @@ const RentDetail=({route,navigation})=>{
                             phone:phone,
                         });
                         Alert.alert("Cập nhật thành công");
-                        navigation.navigate("History");
+                        navigation.goBack();
                     } else  if (user && id_product && day !== undefined && hour !== undefined && quantity !== undefined) {
                         const Rent = await firestore().collection('Rent');
                         // Nếu chưa tồn tại, thêm mới
@@ -127,7 +127,7 @@ const RentDetail=({route,navigation})=>{
                 <HelperText type="error" visible={hasAddressErrors()}>
                     Địa chỉ không được để trống !
                 </HelperText>
-                <TextInput style={{fontSize:20}}  mode="outlined" value={phone} onChangeText={setPhone} label="Số điện thoại"/>
+                <TextInput style={{fontSize:20}} keyboardType="number-pad"  mode="outlined" value={phone} onChangeText={setPhone} label="Số điện thoại"/>
                 <HelperText type="error" visible={hasPhoneErrors()}>
                     Số điện thoại không hợp lệ !
                 </HelperText>
@@ -161,9 +161,9 @@ const RentDetail=({route,navigation})=>{
                 id!=null?<Button style={{position:'absolute',bottom:0,alignSelf:'center',backgroundColor:"#47d147"}} labelStyle={{fontSize:20,color:"white"}} onPress={()=>AddRent()}>Lưu thay đổi</Button>:
             
             <View style={{position:'absolute',bottom:0,backgroundColor:'white',flexDirection:'row',alignSelf:'space-around'}}>
-                <Text style={{fontSize:30,fontWeight:'bold'}}>Tổng tiền: </Text>
-                <Text style={{fontSize:30,fontWeight:'bold'}}>{Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total)}</Text>
-                <Button style={{alignContent:'flex-end',marginLeft:50}} onPress={()=>AddRent()}>Hoàn tất</Button>
+                <Text style={{fontSize:25,fontWeight:'bold',flex:2}}>Tổng tiền: </Text>
+                <Text style={{fontSize:25,fontWeight:'bold',flex:4,color:'red'}}>{Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total)}</Text>
+                <Button style={{alignContent:'flex-end',marginLeft:50,flex:2}} onPress={()=>AddRent()}>Hoàn tất</Button>
             </View>  
             }          
         </View>

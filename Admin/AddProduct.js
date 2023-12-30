@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Image, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Image, StyleSheet, ScrollView } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import firestore  from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
@@ -60,11 +60,10 @@ const AddProductScreen = ({route}) => {
       },
       () => {
         // Lấy URL của ảnh sau khi upload thành công
-        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+        uploadTask.snapshot.ref.getDownloadURL().then(async(downloadURL) => {
           console.log('File available at', downloadURL);
           // Sau khi có URL ảnh, thêm dịch vụ vào Firestore
-          setidP(id)
-          firestore().collection('Product').doc(id_p).set({
+          const Ad=await firestore().collection('Product').add({
             name: name,
             price: price,
             img: downloadURL,
@@ -74,6 +73,9 @@ const AddProductScreen = ({route}) => {
             description:description,
             time:"ngày",
           });
+          await firestore().collection('Product').doc(Ad.id).update({
+            id:Ad.id
+          })
           Alert.alert("Thêm thành công")
           // Đặt lại trạng thái sau khi hoàn thành
          setImgUrl(null);
@@ -82,9 +84,6 @@ const AddProductScreen = ({route}) => {
          setName("");
          setPrice("");
          setRent("");
-
-          // Hiển thị thông báo hoặc chuyển hướng người dùng nếu cần
-          alert('Dịch vụ đã được thêm thành công!');
         });
       }
     );
@@ -97,18 +96,17 @@ const AddProductScreen = ({route}) => {
         }));
         setdata(servicesData);
     });
-
+    console.log(id);
+    setidP(id.toString());
+    console.log(id_p);
     return () => unsubscribe();
 }, []);
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Id Category</Text>
-      <TextInput
-        style={styles.input}
-        value={idCategory}
-        onChangeText={setIdCategory}
-      />
-
+    <ScrollView>
+       
+        <View style={styles.container}>
+        <Text style={styles.label}>Name</Text>
+      <TextInput style={styles.input} value={name} onChangeText={setName} />
       <Text style={styles.label}>Description</Text>
       <TextInput
         style={styles.input}
@@ -116,8 +114,7 @@ const AddProductScreen = ({route}) => {
         onChangeText={setDescription}
       />
 
-      <Text style={styles.label}>Name</Text>
-      <TextInput style={styles.input} value={name} onChangeText={setName} />
+     
 
       <Text style={styles.label}>Price</Text>
       <TextInput style={styles.input} value={price.toString()} onChangeText={setPrice} />
@@ -150,6 +147,7 @@ const AddProductScreen = ({route}) => {
 
       <Button onPress={uploadImageAndAddService}> Thêm sản phẩm</Button>
     </View>
+    </ScrollView>
   );
 };
 

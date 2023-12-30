@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import {  Alert, Image, View } from "react-native";
 import { Text,Button, TextInput, IconButton, HelperText } from "react-native-paper";
 import firestore from '@react-native-firebase/firestore';
+import { sendEmail } from './function';
+
 
 const BuyDetail=({route,navigation})=>{
     const { id_user, id_product,name,price,img,quantity,id } = route.params.product;
@@ -13,7 +15,6 @@ const BuyDetail=({route,navigation})=>{
     const Profile = firestore().collection('Profile');
     async function AddBuy() {
         try {
-                
                 // Nếu chưa tồn tại, thêm mới
                 if(!hasAddressErrors()&&!hasNameErrors()&&!hasPhoneErrors())
                 {
@@ -38,6 +39,8 @@ const BuyDetail=({route,navigation})=>{
                         phone:phone,
                         address:address,
                     });
+                    
+                    
                     Alert.alert("Đặt hàng thành công. Nhấn vào mục Lịch sử để xem lại");
                 }
                 }else{
@@ -112,7 +115,7 @@ const BuyDetail=({route,navigation})=>{
                 <HelperText type="error" visible={hasAddressErrors()}>
                     Địa chỉ không được để trống !
                 </HelperText>
-                <TextInput style={{fontSize:20}}  mode="outlined" value={phone} onChangeText={setPhone} label="Số điện thoại"/>
+                <TextInput style={{fontSize:20}} keyboardType="number-pad"  mode="outlined" value={phone} onChangeText={setPhone} label="Số điện thoại"/>
                 <HelperText type="error" visible={hasPhoneErrors()}>
                     Số điện thoại không hợp lệ !
                 </HelperText>
